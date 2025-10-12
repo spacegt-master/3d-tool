@@ -52,13 +52,15 @@ export class MeshData {
 // 原始文件
 const raw = ref();
 
-const fbxModel = ref();
-const fbxOriginalSize = ref();
+// 原始文件加载后模型文件
+const model = ref();
+const modelOriginalSize = ref();
 
 // 用户输入的总尺寸
 const width = ref<number>(0);
 const height = ref<number>(0);
 const deep = ref<number>(0);
+
 // 固定的木板厚度
 const panelThickness = ref<number>(18); // 假设木板厚度为2个单位
 const panelThicknessUnification = ref(false);
@@ -72,8 +74,8 @@ const meshesData = reactive<MeshData[]>([]);
 export const usePropertiesPanelStore = defineStore("properties-panle", () => {
   return {
     raw,
-    fbxModel,
-    fbxOriginalSize,
+    model,
+    modelOriginalSize,
     width,
     height,
     deep,
@@ -108,30 +110,30 @@ export function centimeter2millimeter(value: number | THREE.Vector3) {
 export function adsorptionFramework(object: THREE.Object3D) {
   let isFullWidth =
     object.scale.x >=
-    fbxOriginalSize.value.x - fbxOriginalSize.value.x * threshold.value;
+    modelOriginalSize.value.x - modelOriginalSize.value.x * threshold.value;
 
   let isFullHeight =
     object.scale.y >=
-    fbxOriginalSize.value.y - fbxOriginalSize.value.y * threshold.value;
+    modelOriginalSize.value.y - modelOriginalSize.value.y * threshold.value;
 
   let isFullDeep =
     object.scale.z >=
-    fbxOriginalSize.value.z - fbxOriginalSize.value.z * threshold.value;
+    modelOriginalSize.value.z - modelOriginalSize.value.z * threshold.value;
 
   if (
     (isFullWidth ? 1 : 0) + (isFullHeight ? 1 : 0) + (isFullDeep ? 1 : 0) >
     1
   ) {
     if (isFullWidth) {
-      object.scale.x = fbxOriginalSize.value.x;
+      object.scale.x = modelOriginalSize.value.x;
       object.position.x = 0;
     }
     if (isFullHeight) {
-      object.scale.y = fbxOriginalSize.value.y;
+      object.scale.y = modelOriginalSize.value.y;
       object.position.y = 0;
     }
     if (isFullDeep) {
-      object.scale.z = fbxOriginalSize.value.z;
+      object.scale.z = modelOriginalSize.value.z;
       object.position.z = 0;
     }
   }

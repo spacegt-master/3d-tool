@@ -1,25 +1,34 @@
 <script setup lang="ts">
-import { BasicShadowMap, SRGBColorSpace, NoToneMapping } from 'three';
-import { OrbitControls, Text3D, FBXModel } from '@tresjs/cientos'
+import ModelLoader from './ModelLoader.vue'
 import ModelWatcher from './ModelWatcher.vue' // 导入你的新组件
+import { BasicShadowMap, SRGBColorSpace, NoToneMapping, ACESFilmicToneMapping } from 'three';
+import { OrbitControls, Environment } from '@tresjs/cientos'
 import { usePropertiesPanelStore, getRawBlobUrl } from '@/stores/properties-panle'
+import { storeToRefs } from 'pinia';
 
 const propertiesPanelStore = usePropertiesPanelStore()
 
+const { raw } = storeToRefs(propertiesPanelStore)
+
 const gl = {
-  clearColor: '#4A5568', // 新的背景颜色
+  clearColor: '#6e7786', // 新的背景颜色
   shadows: true,
   alpha: false,
   shadowMapType: BasicShadowMap,
   outputColorSpace: SRGBColorSpace,
-  toneMapping: NoToneMapping,
+  toneMapping: ACESFilmicToneMapping,
+  toneMappingExposure: 1.2,
 };
+
+const hdrPath = '/hdr/venice_sunset_1k.hdr';
 </script>
 
 <template>
   <TresCanvas v-bind="gl">
     <TresPerspectiveCamera :position="[400, 400, 400]" />
     <OrbitControls />
+
+    <Environment :background="true" :files="hdrPath" :blur="0.35" />
 
     <TresDirectionalLight :position="[150, 200, 250]" :intensity="1.5" cast-shadow />
 
@@ -29,10 +38,8 @@ const gl = {
 
     <TresAmbientLight :intensity="0.5" />
 
-    <Suspense v-if="propertiesPanelStore.raw">
-      <FBXModel :path="getRawBlobUrl()" />
-      <!-- <FBXModel path="/models/common_Wardrobe_DYGT_G032/common_Wardrobe_DYGT_G032.fbx" /> -->
-    </Suspense>
-    <ModelWatcher />
+    <ModelLoader v-if="raw" :url="getRawBlobUrl()" />
+
+    <ModelWatcher v-if="raw" />
   </TresCanvas>
 </template>
