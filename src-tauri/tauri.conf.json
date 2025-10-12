@@ -12,15 +12,12 @@
   "app": {
     "windows": [
       {
-        "label": "main",
-        "title": "Yuyudaren",
+        "title": "3d-tool",
         "width": 1280,
-        "height": 900,
-        "minWidth": 1280,
-        "minHeight": 720,
-        "center": true,
+        "height": 960,
         "resizable": true,
-        "fullscreen": false
+        "fullscreen": false,
+        "dragDropEnabled": true
       }
     ],
     "security": {
@@ -37,10 +34,5 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
-  },
-  "plugins": {
-    "log": {
-      "targets": ["all"]
-    }
   }
 }
