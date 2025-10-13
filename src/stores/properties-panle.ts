@@ -5,7 +5,7 @@ import { reactive, ref } from "vue";
 // 存储单个 Mesh 的数据
 export class MeshData {
   name: string;
-  mesh: any;
+  mesh: Mesh;
   originalPosition: any;
   originalSize: any;
   thicknessAxis: "x" | "y" | "z";
@@ -24,7 +24,7 @@ export class MeshData {
 
   constructor(
     name: string,
-    mesh: any,
+    mesh: Mesh,
     originalPosition: any,
     originalSize: any,
     thicknessAxis: "x" | "y" | "z"
@@ -75,7 +75,7 @@ const threshold = ref(0);
 const meshesData = reactive<MeshData[]>([]);
 
 // 用来存储当前被悬停的 Mesh 实例（数组形式便于 Outline Pass 处理）
-const hoveredMeshes = ref([]); 
+const hoveredMeshes = ref([]);
 
 export const usePropertiesPanelStore = defineStore("properties-panle", () => {
   return {
@@ -90,7 +90,7 @@ export const usePropertiesPanelStore = defineStore("properties-panle", () => {
     panelThicknessUnification,
     threshold,
     meshesData,
-    hoveredMeshes
+    hoveredMeshes,
   };
 });
 

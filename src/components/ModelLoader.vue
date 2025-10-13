@@ -12,8 +12,10 @@ import { markRaw, watch } from 'vue'
 import * as THREE from 'three'
 import { storeToRefs } from 'pinia'
 import type { Mesh } from 'three'
+import { useModelStore } from '@/stores/model'
 
 const propertiesPanelStore = usePropertiesPanelStore()
+const modelStore = useModelStore()
 
 const { modelOriginalSize, width, height, deep, meshesData, isModelReady, hoveredMeshes } = storeToRefs(propertiesPanelStore)
 
@@ -93,14 +95,11 @@ function handleMeshClick(event: any) {
     // event.object 就是被点击的 THREE.Mesh 对象
     const clickedMesh = event.object as THREE.Mesh;
 
-    console.log(`CVZJ: Mesh 被点击了! 名称: ${clickedMesh.name}`);
-
     // 查找并处理对应的数据
     const selectedData = meshesData.value.find(data => data.mesh === clickedMesh);
     if (selectedData) {
         console.log(`选中 Mesh: ${selectedData.name}`);
-        // 💡 可以在这里调用 Pinia action，将 selectedData 存储为当前选中项
-        // propertiesPanelStore.setSelectedData(selectedData);
+        modelStore.selectedData = selectedData
     }
 }
 
