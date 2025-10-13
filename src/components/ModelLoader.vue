@@ -1,19 +1,21 @@
 <template>
-    <primitive v-if="model" :object="model" :scale="1.5" />
+    <primitive v-if="model" v-for="(mash, index) in model.children" :key="mash.uuid" :object="mash"
+        @click="handleMeshClick" @pointerenter="handlePointerEnter" @pointerleave="handlePointerLeave">
+    </primitive>
 </template>
 
 <script setup lang="ts">
 import { useLoader } from '@tresjs/core'
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js'
 import { usePropertiesPanelStore, centimeter2millimeter, adsorptionFramework, calculationFormula, MeshData } from '@/stores/properties-panle'
-import { watch } from 'vue'
+import { markRaw, watch } from 'vue'
 import * as THREE from 'three'
 import { storeToRefs } from 'pinia'
 import type { Mesh } from 'three'
 
 const propertiesPanelStore = usePropertiesPanelStore()
 
-const { modelOriginalSize, width, height, deep, meshesData, isModelReady } = storeToRefs(propertiesPanelStore)
+const { modelOriginalSize, width, height, deep, meshesData, isModelReady, hoveredMeshes } = storeToRefs(propertiesPanelStore)
 
 const props = defineProps({
     url: {
@@ -24,13 +26,22 @@ const props = defineProps({
 
 const { state: model, isLoading } = useLoader(FBXLoader, props.url)
 
+// 🌟 【核心】定义高亮材质：使用 MeshBasicMaterial 实现纯色高亮，性能最好。
+const HOVER_MATERIAL = markRaw(new THREE.MeshBasicMaterial({
+    color: 0xFBB03B, // 使用你之前描边用的黄色/橙色
+    transparent: true,
+    opacity: 0.8, // 略微透明，可以看到原始细节，效果更好
+}));
+// 🌟 【核心】存储原始材质的 Map，key: Mesh 对象, value: 原始材质或材质数组。
+const originalMaterials = new Map<Mesh, THREE.Material | THREE.Material[]>();
+
 watch(model, () => {
     if (isLoading.value) return
 
     if (model.value) {
         propertiesPanelStore.model = model.value
 
-        propertiesPanelStore.meshes = model.value.children as Mesh[]
+        const meshes = model.value.children as Mesh[]
 
         const box = new THREE.Box3().setFromObject(model.value);
         const size = new THREE.Vector3();
@@ -41,8 +52,12 @@ watch(model, () => {
         height.value = centimeter2millimeter(size.y) as number;
         deep.value = centimeter2millimeter(size.z) as number;
 
-        propertiesPanelStore.meshes.forEach((child: Mesh) => {
+        meshes.forEach((child: Mesh) => {
             if (child.isMesh) {
+                // 🌟 关键：克隆材质并存储原始材质。这能确保我们不会影响到其他共享材质的 Mesh。
+                const originalMaterial = Array.isArray(child.material) ? child.material.map(mat => mat.clone()) : child.material.clone();
+                originalMaterials.set(child, originalMaterial);
+
                 adsorptionFramework(child)
 
                 const originalPosition = child.position.clone();
@@ -66,8 +81,56 @@ watch(model, () => {
         })
 
         isModelReady.value = true;
+    } else {
+        meshesData.value = []
     }
 })
+
+/**
+ * 处理 Mesh 点击事件：触发你的 CVZJ 业务逻辑
+ */
+function handleMeshClick(event: any) {
+    // event.object 就是被点击的 THREE.Mesh 对象
+    const clickedMesh = event.object as THREE.Mesh;
+
+    console.log(`CVZJ: Mesh 被点击了! 名称: ${clickedMesh.name}`);
+
+    // 查找并处理对应的数据
+    const selectedData = meshesData.value.find(data => data.mesh === clickedMesh);
+    if (selectedData) {
+        console.log(`选中 Mesh: ${selectedData.name}`);
+        // 💡 可以在这里调用 Pinia action，将 selectedData 存储为当前选中项
+        // propertiesPanelStore.setSelectedData(selectedData);
+    }
+}
+
+/**
+ * 🌟 简化后的鼠标移入：只存原色，不再克隆
+ */
+function handlePointerEnter(event: any) {
+    const enteredMesh = event.object as Mesh;
+    if (enteredMesh && enteredMesh.isMesh) {
+        // 只有当Mesh有原始材质记录时才进行替换，避免操作不相关的对象
+        if (originalMaterials.has(enteredMesh)) {
+            enteredMesh.material = HOVER_MATERIAL; // 🌟 核心高亮
+        }
+    }
+}
+
+/**
+ * 🌟 简化后的鼠标移出：恢复原色
+ */
+function handlePointerLeave(event: any) {
+    const leftMesh = event.object as Mesh;
+    if (leftMesh && leftMesh.isMesh) {
+        const originalMaterial = originalMaterials.get(leftMesh);
+        // 只有当Mesh有原始材质记录时才进行恢复
+        if (originalMaterial) {
+            leftMesh.material = originalMaterial; // 🌟 核心恢复
+        }
+    }
+}
+
 </script>
 
 <style scoped></style>

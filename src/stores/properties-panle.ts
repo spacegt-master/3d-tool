@@ -56,9 +56,6 @@ const raw = ref();
 const model = ref();
 const modelOriginalSize = ref();
 
-// 模型中的 mash 体积
-const meshes = ref<Mesh[]>();
-
 // 模型加载完成的标志
 const isModelReady = ref(false);
 
@@ -74,15 +71,17 @@ const panelThicknessUnification = ref(false);
 // 容差阈值，单位是百分比
 const threshold = ref(0);
 
-// 存储所有木板 Mesh 的数据
+// 存储所有 Mesh 的数据
 const meshesData = reactive<MeshData[]>([]);
+
+// 用来存储当前被悬停的 Mesh 实例（数组形式便于 Outline Pass 处理）
+const hoveredMeshes = ref([]); 
 
 export const usePropertiesPanelStore = defineStore("properties-panle", () => {
   return {
     raw,
     model,
     modelOriginalSize,
-    meshes,
     isModelReady,
     width,
     height,
@@ -91,6 +90,7 @@ export const usePropertiesPanelStore = defineStore("properties-panle", () => {
     panelThicknessUnification,
     threshold,
     meshesData,
+    hoveredMeshes
   };
 });
 

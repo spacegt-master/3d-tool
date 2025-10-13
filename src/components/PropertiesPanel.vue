@@ -3,13 +3,11 @@
         <v-list-item class="py-4">
             <template #title>
                 <div class="text-h6">
-                    Parametric modeling
+                    参数化建模
                 </div>
             </template>
             <template #subtitle>
-                It makes modeling no longer a fixed and one-off result, but a flexible and modifiable "recipe". You can
-                adjust any parameter in the "formula" at any time (such as length, radius, or Angle), and the model will
-                automatically change according to the rules you set, without having to start from scratch to re-model.
+                你的系统正是通过读取 FBX 模型的尺寸，计算出 width、height、deep 等值，并为后续的自动化设计（AI 和自动化）提供参数基础。
             </template>
         </v-list-item>
 
@@ -18,10 +16,10 @@
         <div class="pa-4">
             <div class="d-flex">
                 <div>
-                    <strong>Import from FBX</strong>
+                    <strong>导入 FBX</strong>
 
                     <p class="text-body-2 text-medium-emphasis py-1">
-                        hi! Please upload your.fbx model file. We only support the FBX format!
+                        请上传您的.fbx 模型文件。目前只支持 FBX 格式！
                     </p>
                 </div>
             </div>
@@ -39,7 +37,8 @@
                         </v-avatar>
                     </template>
                     <template #append>
-                        <v-btn class="ml-2" icon="mdi-delete" variant="text" @click="propertiesPanelStore.raw = null" />
+                        <v-btn class="ml-2" icon="mdi-delete" variant="text"
+                            @click="propertiesPanelStore.raw = undefined" />
                     </template>
                 </v-list-item>
             </v-list>
@@ -47,21 +46,21 @@
             <div v-if="propertiesPanelStore.raw">
                 <v-divider />
 
-                <strong style="line-height: 50px;">Variable</strong>
+                <strong style="line-height: 50px;">变量</strong>
 
-                <v-number-input v-model="propertiesPanelStore.width" controlVariant="stacked" label="Width (mm)" :min="1"
-                    :step="1"></v-number-input>
-                <v-number-input v-model="propertiesPanelStore.height" controlVariant="stacked" label="Height (mm)" :min="1"
-                    :step="1"></v-number-input>
+                <v-number-input v-model="propertiesPanelStore.width" controlVariant="stacked" label="Width (mm)"
+                    :min="1" :step="1"></v-number-input>
+                <v-number-input v-model="propertiesPanelStore.height" controlVariant="stacked" label="Height (mm)"
+                    :min="1" :step="1"></v-number-input>
                 <v-number-input v-model="propertiesPanelStore.deep" controlVariant="stacked" label="Deep (mm)" :min="1"
                     :step="1"></v-number-input>
 
                 <v-checkbox v-model="propertiesPanelStore.panelThicknessUnification" hide-details
-                    label="Uniform thickness of the panel"></v-checkbox>
+                    label="统一板材厚度"></v-checkbox>
 
                 <v-number-input v-model="propertiesPanelStore.panelThickness"
                     :disabled="!propertiesPanelStore.panelThicknessUnification" controlVariant="stacked"
-                    label="PanelThickness (mm)" :min="1"></v-number-input>
+                    label="板材厚度 (mm)" :min="1"></v-number-input>
             </div>
 
             <div v-if="!propertiesPanelStore.raw">
@@ -72,7 +71,7 @@
                     step="0.025" tick-size="4"></v-slider>
             </div>
             <div v-if="propertiesPanelStore.raw">
-                <strong style="line-height: 50px;">Mesh Formula</strong>
+                <strong style="line-height: 50px;">Mesh 公式</strong>
 
                 <v-expansion-panels class="mb-6">
                     <v-expansion-panel v-for="(meshData, index) in propertiesPanelStore.meshesData" :key="index">
@@ -81,28 +80,33 @@
                             {{ meshData.name }}
                         </v-expansion-panel-title>
                         <v-expansion-panel-text>
-                            <strong style="line-height: 50px;">Position</strong>
+                            <strong style="line-height: 50px;">位置</strong>
 
                             <v-textarea v-model="meshData.formula.position.x" rows="1"
                                 :label="`x: ${Math.trunc(meshData.mesh.position.x * 10)}`"
                                 variant="solo-filled"></v-textarea>
 
                             <v-textarea v-model="meshData.formula.position.y" rows="1"
-                                :label="`y: ${Math.trunc(meshData.mesh.position.y)}`" variant="solo-filled"></v-textarea>
+                                :label="`y: ${Math.trunc(meshData.mesh.position.y)}`"
+                                variant="solo-filled"></v-textarea>
 
                             <v-textarea v-model="meshData.formula.position.z" rows="1"
-                                :label="`z: ${Math.trunc(meshData.mesh.position.z)}`" variant="solo-filled"></v-textarea>
+                                :label="`z: ${Math.trunc(meshData.mesh.position.z)}`"
+                                variant="solo-filled"></v-textarea>
 
-                            <strong style="line-height: 50px;">Size</strong>
+                            <strong style="line-height: 50px;">尺寸</strong>
 
                             <v-textarea v-model="meshData.formula.scale.x" rows="1"
-                                :label="`Width: ${Math.trunc(meshData.mesh.scale.x)}`" variant="solo-filled"></v-textarea>
+                                :label="`Width: ${Math.trunc(meshData.mesh.scale.x)}`"
+                                variant="solo-filled"></v-textarea>
 
                             <v-textarea v-model="meshData.formula.scale.y" rows="1"
-                                :label="`Height: ${Math.trunc(meshData.mesh.scale.y)}`" variant="solo-filled"></v-textarea>
+                                :label="`Height: ${Math.trunc(meshData.mesh.scale.y)}`"
+                                variant="solo-filled"></v-textarea>
 
                             <v-textarea v-model="meshData.formula.scale.z" rows="1"
-                                :label="`Deep: ${Math.trunc(meshData.mesh.scale.z)}`" variant="solo-filled"></v-textarea>
+                                :label="`Deep: ${Math.trunc(meshData.mesh.scale.z)}`"
+                                variant="solo-filled"></v-textarea>
 
                         </v-expansion-panel-text>
                     </v-expansion-panel>
