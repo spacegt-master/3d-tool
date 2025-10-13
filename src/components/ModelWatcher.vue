@@ -1,56 +1,13 @@
 <script setup lang="ts">
-import { useTresContext } from '@tresjs/core'
 import { watch, ref } from 'vue'
-import * as THREE from 'three'
-import { usePropertiesPanelStore, centimeter2millimeter, adsorptionFramework, calculationFormula, MeshData } from '@/stores/properties-panle';
+import { usePropertiesPanelStore } from '@/stores/properties-panle';
 import { storeToRefs } from 'pinia'
 
 const propertiesPanelStore = usePropertiesPanelStore()
 
 // 从 Pinia store 中获取所有响应式数据
-const { model, modelOriginalSize, width, height, deep, panelThickness, panelThicknessUnification, meshesData } = storeToRefs(propertiesPanelStore)
+const { modelOriginalSize, width, height, deep, panelThickness, panelThicknessUnification, meshesData, isModelReady } = storeToRefs(propertiesPanelStore)
 
-// 新增：模型加载完成的标志
-const isModelReady = ref(false)
-
-// 监听 raw 文件的变化，当新文件上传时，重新初始化模型数据
-watch(model, () => {
-    if (model.value) {
-        const box = new THREE.Box3().setFromObject(model.value);
-        const size = new THREE.Vector3();
-        box.getSize(size);
-
-        modelOriginalSize.value = centimeter2millimeter(size.clone());
-        width.value = centimeter2millimeter(size.x) as number;
-        height.value = centimeter2millimeter(size.y) as number;
-        deep.value = centimeter2millimeter(size.z) as number;
-
-        model.value.traverse((child: any) => {
-            if (child.isMesh) {
-                adsorptionFramework(child)
-
-                const originalPosition = child.position.clone();
-                const originalSize = new THREE.Vector3();
-                // 获取 Mesh 的实际尺寸
-                new THREE.Box3().setFromObject(child).getSize(originalSize);
-
-                // 新增：保存原始的 scale 值
-                const minSize = Math.min(originalSize.x, originalSize.y, originalSize.z);
-                let thicknessAxis = '';
-                if (minSize === originalSize.x) thicknessAxis = 'x';
-                else if (minSize === originalSize.y) thicknessAxis = 'y';
-                else thicknessAxis = 'z';
-
-                const meshData = new MeshData(child.name, child, originalPosition, centimeter2millimeter(originalSize), thicknessAxis as "x" | "y" | "z")
-
-                calculationFormula(meshData)
-
-                meshesData.value.push(meshData);
-            }
-        });
-        isModelReady.value = true;
-    }
-});
 
 // 监听 store 中尺寸和厚度的变化，并对每个木板进行缩放和定位
 watch([width, height, deep, panelThickness, panelThicknessUnification], ([newWidth, newHeight, newDeep, newThickness, panelThicknessUnification]) => {

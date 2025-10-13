@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
+import type { Object3D, Vector3, Mesh } from "three";
 import { reactive, ref } from "vue";
-import * as THREE from "three";
 
 // 存储单个 Mesh 的数据
 export class MeshData {
@@ -56,6 +56,12 @@ const raw = ref();
 const model = ref();
 const modelOriginalSize = ref();
 
+// 模型中的 mash 体积
+const meshes = ref<Mesh[]>();
+
+// 模型加载完成的标志
+const isModelReady = ref(false);
+
 // 用户输入的总尺寸
 const width = ref<number>(0);
 const height = ref<number>(0);
@@ -76,6 +82,8 @@ export const usePropertiesPanelStore = defineStore("properties-panle", () => {
     raw,
     model,
     modelOriginalSize,
+    meshes,
+    isModelReady,
     width,
     height,
     deep,
@@ -90,7 +98,7 @@ export function getRawBlobUrl() {
   return URL.createObjectURL(raw.value);
 }
 
-export function centimeter2millimeter(value: number | THREE.Vector3) {
+export function centimeter2millimeter(value: number | Vector3) {
   if (typeof value === "number") {
     return Math.trunc(value * 10);
   }
@@ -107,7 +115,7 @@ export function centimeter2millimeter(value: number | THREE.Vector3) {
   return value;
 }
 
-export function adsorptionFramework(object: THREE.Object3D) {
+export function adsorptionFramework(object: Object3D) {
   let isFullWidth =
     object.scale.x >=
     modelOriginalSize.value.x - modelOriginalSize.value.x * threshold.value;
@@ -231,5 +239,3 @@ export function calculationFormula(meshData: MeshData) {
     )}`;
   }
 }
-
-

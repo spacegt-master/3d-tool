@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import ModelLoader from './ModelLoader.vue'
-import ModelWatcher from './ModelWatcher.vue' // 导入你的新组件
 import { BasicShadowMap, SRGBColorSpace, NoToneMapping, ACESFilmicToneMapping } from 'three';
 import { OrbitControls, Environment } from '@tresjs/cientos'
 import { usePropertiesPanelStore, getRawBlobUrl } from '@/stores/properties-panle'
