@@ -1,8 +1,11 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { Pane } from "tweakpane";
+import { useModelStore } from "./model";
 
 export const useTweakpaneStore = defineStore("tweakpane", () => {
+  const modelStore = useModelStore();
+
   const pane = ref<Pane>();
 
   // Reactive properties that will be controlled by Tweakpane
@@ -19,10 +22,16 @@ export const useTweakpaneStore = defineStore("tweakpane", () => {
     material: "basic",
   });
 
-  function init(paneContainer: HTMLElement) {
+  function init(paneContainer?: HTMLElement) {
+    if (!paneContainer) return;
+
+    // 确保每次调用 init() 时，只有一个活跃的面板。
+    dispose();
+    console.log(modelStore.selectedData)
+
     // Create Tweakpane instance with container
     pane.value = new Pane({
-      title: "Scene Controls",
+      title:`${modelStore.selectedData.name} Controls`,
       container: paneContainer,
     });
 
@@ -97,7 +106,9 @@ export const useTweakpaneStore = defineStore("tweakpane", () => {
   }
 
   function dispose() {
-    pane.value?.dispose();
+    if (pane.value) {
+      pane.value.dispose();
+    }
   }
   return {
     pane,

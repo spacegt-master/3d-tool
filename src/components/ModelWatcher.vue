@@ -2,11 +2,14 @@
 import { watch, ref } from 'vue'
 import { usePropertiesPanelStore } from '@/stores/properties-panle';
 import { storeToRefs } from 'pinia'
+import { useModelStore } from '@/stores/model';
 
 const propertiesPanelStore = usePropertiesPanelStore()
+const modelStore = useModelStore()
 
 // 从 Pinia store 中获取所有响应式数据
-const { modelOriginalSize, width, height, deep, panelThickness, panelThicknessUnification, meshesData, isModelReady } = storeToRefs(propertiesPanelStore)
+const { width, height, deep, panelThickness, panelThicknessUnification } = storeToRefs(propertiesPanelStore)
+const { modelOriginalSize, meshesData, isModelReady } = storeToRefs(modelStore)
 
 
 // 监听 store 中尺寸和厚度的变化，并对每个木板进行缩放和定位

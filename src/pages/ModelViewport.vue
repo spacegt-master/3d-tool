@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { BasicShadowMap, SRGBColorSpace, ACESFilmicToneMapping } from 'three';
 import { OrbitControls, Environment } from '@tresjs/cientos'
-import { usePropertiesPanelStore, getRawBlobUrl } from '@/stores/properties-panle'
+import { usePropertiesPanelStore } from '@/stores/properties-panle'
 import { storeToRefs } from 'pinia';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onUnmounted, ref, watch } from 'vue';
 import { useTweakpaneStore } from '@/stores/tweakpane';
+import { useModelStore } from '@/stores/model';
 
 const propertiesPanelStore = usePropertiesPanelStore()
 const tweakpaneStore = useTweakpaneStore()
+const modelStore = useModelStore()
 
-const { raw, hoveredMeshes } = storeToRefs(propertiesPanelStore)
+const { raw } = storeToRefs(propertiesPanelStore)
 
 const gl = {
   clearColor: '#6e7786', // 新的背景颜色
@@ -23,13 +25,9 @@ const gl = {
 
 const hdrPath = '/hdr/venice_sunset_1k.hdr';
 
-
 const paneContainer = ref<HTMLElement>()
 
-
-onMounted(() => {
-  if (!paneContainer.value) return
-
+watch(() => modelStore.selectedData, () => {
   tweakpaneStore.init(paneContainer.value)
 })
 
@@ -37,7 +35,6 @@ onMounted(() => {
 onUnmounted(() => {
   tweakpaneStore.dispose()
 })
-
 </script>
 
 <template>
@@ -60,7 +57,7 @@ onUnmounted(() => {
 
       <TresAmbientLight :intensity="0.5" />
 
-      <ModelLoader v-if="raw" :url="getRawBlobUrl()" />
+      <ModelLoader v-if="raw" :url="propertiesPanelStore.getRawBlobUrl()" />
 
       <ModelWatcher v-if="raw" />
 

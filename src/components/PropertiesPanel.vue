@@ -55,6 +55,8 @@
                 <v-number-input v-model="propertiesPanelStore.deep" controlVariant="stacked" label="Deep (mm)" :min="1"
                     :step="1"></v-number-input>
 
+                <add-custom-variables></add-custom-variables>
+
                 <v-checkbox v-model="propertiesPanelStore.panelThicknessUnification" hide-details
                     label="统一板材厚度"></v-checkbox>
 
@@ -74,7 +76,7 @@
                 <strong style="line-height: 50px;">Mesh 公式</strong>
 
                 <v-expansion-panels class="mb-6">
-                    <v-expansion-panel v-for="(meshData, index) in propertiesPanelStore.meshesData" :key="index">
+                    <v-expansion-panel v-for="(meshData, index) in modelStore.meshesData" :key="index">
                         <v-expansion-panel-title expand-icon="mdi-menu-down">
                             <v-icon class="mr-2" icon="mdi-cube-outline"></v-icon>
                             {{ meshData.name }}
@@ -117,10 +119,11 @@
 </template>
 
 <script setup lang="ts">
-import { MeshData, usePropertiesPanelStore } from '@/stores/properties-panle.ts'
+import { useModelStore, MeshData } from '@/stores/model'
+import { usePropertiesPanelStore } from '@/stores/properties-panle.ts'
 
 const propertiesPanelStore = usePropertiesPanelStore()
-
+const modelStore = useModelStore()
 
 function getSizeLabel(meshData: MeshData, axis: string) {
     if (meshData.thicknessAxis == 'x') {

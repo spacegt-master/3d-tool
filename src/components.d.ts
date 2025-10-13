@@ -8,10 +8,13 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AddCustomVariables: typeof import('./components/AddCustomVariables.vue')['default']
     ModelLoader: typeof import('./components/ModelLoader.vue')['default']
     ModelWatcher: typeof import('./components/ModelWatcher.vue')['default']
     PropertiesPanel: typeof import('./components/PropertiesPanel.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SelectModel: typeof import('./components/SelectModel.vue')['default']
+    ToleranceThreshold: typeof import('./components/ToleranceThreshold.vue')['default']
   }
 }

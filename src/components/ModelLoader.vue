@@ -7,17 +7,18 @@
 <script setup lang="ts">
 import { useLoader } from '@tresjs/core'
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js'
-import { usePropertiesPanelStore, centimeter2millimeter, adsorptionFramework, calculationFormula, MeshData } from '@/stores/properties-panle'
+import { usePropertiesPanelStore } from '@/stores/properties-panle'
 import { markRaw, watch } from 'vue'
 import * as THREE from 'three'
 import { storeToRefs } from 'pinia'
 import type { Mesh } from 'three'
-import { useModelStore } from '@/stores/model'
+import { centimeter2millimeter, MeshData, useModelStore } from '@/stores/model'
 
 const propertiesPanelStore = usePropertiesPanelStore()
 const modelStore = useModelStore()
 
-const { modelOriginalSize, width, height, deep, meshesData, isModelReady, hoveredMeshes } = storeToRefs(propertiesPanelStore)
+const { width, height, deep } = storeToRefs(propertiesPanelStore)
+const { modelOriginalSize, meshesData, isModelReady } = storeToRefs(modelStore)
 
 const props = defineProps({
     url: {
@@ -41,7 +42,7 @@ watch(model, () => {
     if (isLoading.value) return
 
     if (model.value) {
-        propertiesPanelStore.model = model.value
+        modelStore.model = model.value
 
         const meshes = model.value.children as Mesh[]
 
@@ -60,7 +61,7 @@ watch(model, () => {
                 const originalMaterial = Array.isArray(child.material) ? child.material.map(mat => mat.clone()) : child.material.clone();
                 originalMaterials.set(child, originalMaterial);
 
-                adsorptionFramework(child)
+                modelStore.adsorptionFramework(child)
 
                 const originalPosition = child.position.clone();
                 const originalSize = new THREE.Vector3();
@@ -76,7 +77,7 @@ watch(model, () => {
 
                 const meshData = new MeshData(child.name, child, originalPosition, centimeter2millimeter(originalSize), thicknessAxis as "x" | "y" | "z")
 
-                calculationFormula(meshData)
+                modelStore.calculationFormula(meshData)
 
                 meshesData.value.push(meshData);
             }
@@ -94,11 +95,10 @@ watch(model, () => {
 function handleMeshClick(event: any) {
     // event.object 就是被点击的 THREE.Mesh 对象
     const clickedMesh = event.object as THREE.Mesh;
-
     // 查找并处理对应的数据
-    const selectedData = meshesData.value.find(data => data.mesh === clickedMesh);
+    const selectedData = meshesData.value.find(data => data.mesh.uuid === clickedMesh.uuid);
+
     if (selectedData) {
-        console.log(`选中 Mesh: ${selectedData.name}`);
         modelStore.selectedData = selectedData
     }
 }
