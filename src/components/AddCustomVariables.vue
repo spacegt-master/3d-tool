@@ -6,7 +6,11 @@
             <template v-slot:default="{ isActive }">
                 <v-card prepend-icon="mdi-picture-in-picture-bottom-right" title="添加自定义变量">
                     <template #text>
-                        <tolerance-threshold v-model="tolerance"></tolerance-threshold>
+                        <!-- <tolerance-threshold v-model="tolerance"></tolerance-threshold> -->
+
+                        <v-sheet width="100%" height="500px">
+                            <select-model></select-model>
+                        </v-sheet>
                     </template>
 
                     <template v-slot:actions>
@@ -20,7 +24,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-
 
 const tolerance = ref(0)
 </script>
