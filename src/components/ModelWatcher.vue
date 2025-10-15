@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, ref } from 'vue'
+import { watch } from 'vue'
 import { usePropertiesPanelStore } from '@/stores/properties-panle';
 import { storeToRefs } from 'pinia'
 import { useModelStore } from '@/stores/model';
@@ -30,25 +30,29 @@ watch([width, height, deep, panelThickness, panelThicknessUnification], ([newWid
 
         let newScaleX, newScaleY, newScaleZ;
 
-        // 根据厚度轴，应用新的尺寸
-        if (thicknessAxis === 'x') {
-            // 新的比例 = (目标厚度 / 原始厚度) * 原始 scale
-            if (panelThicknessUnification) newScaleX = (newThickness / originalSize.x) * originalSize.x;
-            else newScaleX = originalSize.x;
-            // 保持其他轴的相对比例
-            newScaleY = originalSize.y * scaleFactorY;
-            newScaleZ = originalSize.z * scaleFactorZ;
-        } else if (thicknessAxis === 'y') {
-            newScaleX = originalSize.x * scaleFactorX;
-            if (panelThicknessUnification) newScaleY = (newThickness / originalSize.y) * originalSize.y;
-            else newScaleY = originalSize.y;
-            newScaleZ = originalSize.z * scaleFactorZ;
-        } else if (thicknessAxis === 'z') {
-            newScaleX = originalSize.x * scaleFactorX;
-            newScaleY = originalSize.y * scaleFactorY;
-            if (panelThicknessUnification) newScaleZ = (newThickness / originalSize.z) * originalSize.z;
-            else newScaleZ = originalSize.z;
-        }
+        // // 根据厚度轴，应用新的尺寸
+        // if (thicknessAxis === 'x') {
+        //     // 新的比例 = (目标厚度 / 原始厚度) * 原始 scale
+        //     if (panelThicknessUnification) newScaleX = (newThickness / originalSize.x) * originalSize.x;
+        //     else newScaleX = originalSize.x;
+        //     // 保持其他轴的相对比例
+        //     newScaleY = originalSize.y * scaleFactorY;
+        //     newScaleZ = originalSize.z * scaleFactorZ;
+        // } else if (thicknessAxis === 'y') {
+        //     newScaleX = originalSize.x * scaleFactorX;
+        //     if (panelThicknessUnification) newScaleY = (newThickness / originalSize.y) * originalSize.y;
+        //     else newScaleY = originalSize.y;
+        //     newScaleZ = originalSize.z * scaleFactorZ;
+        // } else if (thicknessAxis === 'z') {
+        //     newScaleX = originalSize.x * scaleFactorX;
+        //     newScaleY = originalSize.y * scaleFactorY;
+        //     if (panelThicknessUnification) newScaleZ = (newThickness / originalSize.z) * originalSize.z;
+        //     else newScaleZ = originalSize.z;
+        // }
+
+        newScaleX = originalSize.x * scaleFactorX;
+        newScaleY = originalSize.y * scaleFactorY;
+        newScaleZ = originalSize.z * scaleFactorZ;
 
         // 应用新的大小和位置
         mesh.scale.set(newScaleX * 10, newScaleY * 10, newScaleZ * 10);

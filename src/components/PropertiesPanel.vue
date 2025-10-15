@@ -49,20 +49,44 @@
                 <strong style="line-height: 50px;">变量</strong>
 
                 <v-number-input v-model="propertiesPanelStore.width" controlVariant="stacked" label="Width (cm)"
-                    :min="0.1" :step="0.1"></v-number-input>
+                    :min="0.1" :step="0.1" :precision="1"></v-number-input>
                 <v-number-input v-model="propertiesPanelStore.height" controlVariant="stacked" label="Height (cm)"
-                    :min="0.01" :step="0.1"></v-number-input>
+                    :min="0.01" :step="0.1" :precision="1"></v-number-input>
                 <v-number-input v-model="propertiesPanelStore.deep" controlVariant="stacked" label="Deep (cm)"
-                    :min="0.1" :step="0.01"></v-number-input>
+                    :min="0.1" :step="0.1" :precision="1"></v-number-input>
 
                 <add-custom-variables></add-custom-variables>
+
+                <v-list lines="two" variant="flat">
+                    <v-list-subheader>自定义变量</v-list-subheader>
+
+                    <div class="text-caption ps-4">
+                        将 3D 模型（Mesh）的某个物理尺寸，转化为一个可控的参数名。用用户可读的名称和逻辑来控制 3D 模型的几何尺寸。
+                    </div>
+
+                    <div class="pa-3">
+                        <v-list-item v-for="item in items" :key="item.title" base-color="surface-light" class="mt-2"
+                            rounded>
+                            <template #title>
+                                <v-number-input v-model="propertiesPanelStore.deep" controlVariant="stacked"
+                                    label="Deep (cm)" :min="0.1" :step="0.1" :precision="1"
+                                    hideDetails></v-number-input>
+                            </template>
+
+                            <template #append>
+                                <v-btn class="text-none text-disabled ml-2" text="编辑" variant="tonal"
+                                    style="height:60px" />
+                            </template>
+                        </v-list-item>
+                    </div>
+                </v-list>
 
                 <v-checkbox v-model="propertiesPanelStore.panelThicknessUnification" hide-details
                     label="统一板材厚度"></v-checkbox>
 
                 <v-number-input v-model="propertiesPanelStore.panelThickness"
                     :disabled="!propertiesPanelStore.panelThicknessUnification" controlVariant="stacked"
-                    label="板材厚度 (cm)" :min="0.1" :step="0.01"></v-number-input>
+                    label="板材厚度 (cm)" :min="0.1" :step="0.1"></v-number-input>
             </div>
 
             <!-- <div v-if="!propertiesPanelStore.raw">
@@ -119,52 +143,39 @@
 </template>
 
 <script setup lang="ts">
-import { useModelStore, MeshData } from '@/stores/model'
+import { useModelStore } from '@/stores/model'
 import { usePropertiesPanelStore } from '@/stores/properties-panle.ts'
 
 const propertiesPanelStore = usePropertiesPanelStore()
 const modelStore = useModelStore()
 
-function getSizeLabel(meshData: MeshData, axis: string) {
-    if (meshData.thicknessAxis == 'x') {
-        switch (axis) {
-            case 'x':
-                return 'PanelThickness'
-            case 'y':
-                return 'Height'
-            case 'z':
-                return 'Width'
-        }
-    } else if (meshData.thicknessAxis == 'y') {
-        switch (axis) {
-            case 'x':
-                return 'Width'
-            case 'y':
-                return 'PanelThickness'
-            case 'z':
-                return 'Height'
-        }
-    } else if (meshData.thicknessAxis == 'z') {
-        switch (axis) {
-            case 'x':
-                return 'Width'
-            case 'y':
-                return 'Height'
-            case 'z':
-                return 'PanelThickness'
-        }
-    }
-}
-
-function reset(meshData: MeshData) {
-    meshData.mesh.position.x = meshData.originalPosition.x
-    meshData.mesh.position.y = meshData.originalPosition.y
-    meshData.mesh.position.z = meshData.originalPosition.z
-
-    meshData.mesh.scale.x = meshData.originalSize.x
-    meshData.mesh.scale.y = meshData.originalSize.y
-    meshData.mesh.scale.z = meshData.originalSize.z
-}
+const items = [
+    {
+        emoji: '🎉',
+        title: 'Introduce yourself to the Community',
+        subtitle: '#introductions',
+    },
+    {
+        emoji: '💬',
+        title: 'Ask general questions about Vuetify',
+        subtitle: '#general-discussion',
+    },
+    {
+        emoji: '🆘',
+        title: 'Get help & advice direct from Vuetify pros',
+        subtitle: '#subscriber-help',
+    },
+    {
+        emoji: '3️⃣',
+        title: 'Obtain communty assistance for Vuetify 3',
+        subtitle: '#vuetify-3-help',
+    },
+    {
+        emoji: '2️⃣',
+        title: 'Obtain communty assistance for Vuetify 2',
+        subtitle: '#vuetify-2-help',
+    },
+]
 </script>
 
 <style scoped></style>

@@ -82,7 +82,7 @@ const size = computed(() => {
     // 创建一个 Vector3 实例来存储尺寸
     const dimensions = new Vector3();
     box.getSize(dimensions);
-    
+
     // 返回 Mesh 的原始尺寸 
     return {
         x: dimensions.x, // width
@@ -114,7 +114,8 @@ function handleClickSide(side: 'x' | 'y' | 'z') {
 
     sideModel.value = {
         axis: side,
-        value: baseValue
+        value: baseValue,
+        mesh: props.mesh
     }
 }
 

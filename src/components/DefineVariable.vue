@@ -1,6 +1,6 @@
 <template>
 
-    <div class="p-6 pt-0 h-full flex flex-col justify-between">
+    <div class="pa-4 pt-0 h-full flex flex-col justify-between">
         <div v-if="sideData" class="bg-blue-50 p-4 rounded-lg shadow-inner mb-6 ">
             <p class="text-lg font-medium mb-1">基准轴向已选定：
                 <span class="text-blue-600 font-extrabold text-2xl ml-2">{{ sideData.axis.toUpperCase() }} </span>
@@ -36,12 +36,11 @@
 import type { SideData } from '@/types/mesh';
 import { ref, watch, onMounted } from 'vue';
 
+const variableModel = defineModel()
+
 const props = defineProps<{
     sideData: SideData | undefined
 }>();
-
-// 定义一个 emit，用于通知父组件步骤完成
-const emit = defineEmits(['variable-defined']);
 
 const variableName = ref('');
 const variableValue = ref('');
@@ -61,35 +60,42 @@ watch(() => props.sideData, (newVal) => {
 });
 
 function initializeForm(data: SideData) {
-    console.log(data)
     variableValue.value = data.value.toFixed(3);
     // 根据轴向给一个默认名称建议
     if (data.axis === 'x') variableName.value = 'width_var';
     if (data.axis === 'y') variableName.value = 'height_var';
     if (data.axis === 'z') variableName.value = 'depth_var';
 }
-
+ 
 function saveVariable() {
     if (!variableName.value || !props.sideData) return;
 
+    // 🌟 1. 尝试将用户输入的值解析为数字
+    const initialValue = props.sideData.value;
+    const targetValue = parseFloat(variableValue.value);
+
+    // 🌟 2. 检查 targetValue 是否是有效的数字，如果不是，我们只保存文本（表达式）
+    let scaleFactor: number | null = null;
+    if (!isNaN(targetValue) && initialValue > 0) {
+        // 计算缩放比例：目标值 / 原始测得值
+        scaleFactor = targetValue / initialValue;
+        console.log(`[Scale Calculation] Target: ${targetValue}, Initial: ${initialValue}, Factor: ${scaleFactor}`);
+    } else {
+        // 如果输入的是表达式，scaleFactor 留空，等待系统推理处理
+        console.log(`[Scale Calculation] Value is not a simple number, saving as expression.`);
+    }
+
     const newVariable = {
         name: variableName.value,
-        value: variableValue.value,
+        value: variableValue.value, // 用户的原始输入（可能是数字或表达式）
         axis: props.sideData.axis,
-        initialValue: props.sideData.value,
+        initialValue: initialValue, // 原始测得尺寸
         description: description.value,
+        scaleFactor: scaleFactor, // 🌟 新增：如果它是数字，就计算缩放比例
     };
 
     console.log('🌟 变量定义完成:', newVariable);
 
-    // 假设变量保存成功，通知父组件可以进入下一步
-    emit('variable-defined', newVariable);
+    variableModel.value = newVariable
 }
 </script>
-
-<style scoped>
-/* 确保组件充满容器并使用 flex 布局 */
-.p-6 {
-    padding: 1.5rem;
-}
-</style>

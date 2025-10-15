@@ -18,6 +18,7 @@ declare module 'vue' {
     SelectMesh: typeof import('./components/SelectMesh.vue')['default']
     SelectMeshSide: typeof import('./components/SelectMeshSide.vue')['default']
     SelectModel: typeof import('./components/SelectModel.vue')['default']
+    SystemInference: typeof import('./components/SystemInference.vue')['default']
     ToleranceThreshold: typeof import('./components/ToleranceThreshold.vue')['default']
   }
 }
