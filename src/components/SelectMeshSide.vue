@@ -44,13 +44,10 @@
 </template>
 
 <script setup lang="ts">
-import { BasicShadowMap, SRGBColorSpace, ACESFilmicToneMapping, Mesh, Material, MeshBasicMaterial, BoxHelper, PointLightHelper, Box3, Vector3 } from 'three';
-import { Helper, OrbitControls, Line2, TransformControls } from '@tresjs/cientos'
-import { VertexNormalsHelper } from 'three-stdlib'
-import { computed, markRaw, onMounted, ref, watch } from 'vue';
-import { usePropertiesPanelStore } from '@/stores/properties-panle';
+import { BasicShadowMap, SRGBColorSpace, ACESFilmicToneMapping, Mesh, Box3, Vector3 } from 'three';
+import { OrbitControls } from '@tresjs/cientos'
+import { computed, ref } from 'vue';
 import { TresCanvas } from '@tresjs/core'
-import { shallowRef } from 'vue';
 
 const sideModel = defineModel()
 
@@ -85,7 +82,7 @@ const size = computed(() => {
     // 创建一个 Vector3 实例来存储尺寸
     const dimensions = new Vector3();
     box.getSize(dimensions);
-    console.log(dimensions)
+    
     // 返回 Mesh 的原始尺寸 
     return {
         x: dimensions.x, // width
@@ -115,7 +112,10 @@ function handleClickSide(side: 'x' | 'y' | 'z') {
 
     // TODO: 通知父组件（或 Store）进入“设定变量名”步骤
 
-    sideModel.value = side
+    sideModel.value = {
+        axis: side,
+        value: baseValue
+    }
 }
 
 /**

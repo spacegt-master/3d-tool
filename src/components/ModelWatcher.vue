@@ -11,7 +11,6 @@ const modelStore = useModelStore()
 const { width, height, deep, panelThickness, panelThicknessUnification } = storeToRefs(propertiesPanelStore)
 const { modelOriginalSize, meshesData, isModelReady } = storeToRefs(modelStore)
 
-
 // 监听 store 中尺寸和厚度的变化，并对每个木板进行缩放和定位
 watch([width, height, deep, panelThickness, panelThicknessUnification], ([newWidth, newHeight, newDeep, newThickness, panelThicknessUnification]) => {
     // 如果模型数据未加载完成，则立即退出
@@ -52,7 +51,7 @@ watch([width, height, deep, panelThickness, panelThicknessUnification], ([newWid
         }
 
         // 应用新的大小和位置
-        mesh.scale.set(newScaleX, newScaleY, newScaleZ);
+        mesh.scale.set(newScaleX * 10, newScaleY * 10, newScaleZ * 10);
         mesh.position.set(originalPosition.x * scaleFactorX, originalPosition.y * scaleFactorY, originalPosition.z * scaleFactorZ);
     });
 });

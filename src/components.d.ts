@@ -9,6 +9,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AddCustomVariables: typeof import('./components/AddCustomVariables.vue')['default']
+    DefineVariable: typeof import('./components/DefineVariable.vue')['default']
     ModelLoader: typeof import('./components/ModelLoader.vue')['default']
     ModelWatcher: typeof import('./components/ModelWatcher.vue')['default']
     PropertiesPanel: typeof import('./components/PropertiesPanel.vue')['default']

@@ -12,7 +12,7 @@ import { markRaw, watch } from 'vue'
 import * as THREE from 'three'
 import { storeToRefs } from 'pinia'
 import type { Mesh } from 'three'
-import { centimeter2millimeter, MeshData, useModelStore } from '@/stores/model'
+import { MeshData, useModelStore } from '@/stores/model'
 
 const propertiesPanelStore = usePropertiesPanelStore()
 const modelStore = useModelStore()
@@ -45,15 +45,14 @@ watch(model, () => {
         modelStore.model = model.value
 
         const meshes = model.value.children as Mesh[]
-
         const box = new THREE.Box3().setFromObject(model.value);
         const size = new THREE.Vector3();
         box.getSize(size);
 
-        modelOriginalSize.value = centimeter2millimeter(size.clone());
-        width.value = centimeter2millimeter(size.x) as number;
-        height.value = centimeter2millimeter(size.y) as number;
-        deep.value = centimeter2millimeter(size.z) as number;
+        modelOriginalSize.value = size.clone()
+        width.value = Math.round(size.x * 10) / 10
+        height.value = Math.round(size.y * 10) / 10
+        deep.value = Math.round(size.z * 10) / 10
 
         meshes.forEach((child: Mesh) => {
             if (child.isMesh) {
@@ -61,7 +60,7 @@ watch(model, () => {
                 const originalMaterial = Array.isArray(child.material) ? child.material.map(mat => mat.clone()) : child.material.clone();
                 originalMaterials.set(child, originalMaterial);
 
-                modelStore.adsorptionFramework(child)
+                // modelStore.adsorptionFramework(child)
 
                 const originalPosition = child.position.clone();
                 const originalSize = new THREE.Vector3();
@@ -75,14 +74,14 @@ watch(model, () => {
                 else if (minSize === originalSize.y) thicknessAxis = 'y';
                 else thicknessAxis = 'z';
 
-                const meshData = new MeshData(child.name, child, originalPosition, centimeter2millimeter(originalSize), thicknessAxis as "x" | "y" | "z")
+                const meshData = new MeshData(child.name, child, originalPosition, originalSize, thicknessAxis as "x" | "y" | "z")
 
                 modelStore.calculationFormula(meshData)
 
                 meshesData.value.push(meshData);
             }
         })
-
+        console.log(meshesData)
         isModelReady.value = true;
     } else {
         meshesData.value = []

@@ -60,7 +60,6 @@ onUnmounted(() => {
       <ModelLoader v-if="raw" :url="propertiesPanelStore.getRawBlobUrl()" />
 
       <ModelWatcher v-if="raw" />
-
     </TresCanvas>
   </div>
 </template>

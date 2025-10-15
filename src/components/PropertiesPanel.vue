@@ -48,12 +48,12 @@
 
                 <strong style="line-height: 50px;">变量</strong>
 
-                <v-number-input v-model="propertiesPanelStore.width" controlVariant="stacked" label="Width (mm)"
-                    :min="1" :step="1"></v-number-input>
-                <v-number-input v-model="propertiesPanelStore.height" controlVariant="stacked" label="Height (mm)"
-                    :min="1" :step="1"></v-number-input>
-                <v-number-input v-model="propertiesPanelStore.deep" controlVariant="stacked" label="Deep (mm)" :min="1"
-                    :step="1"></v-number-input>
+                <v-number-input v-model="propertiesPanelStore.width" controlVariant="stacked" label="Width (cm)"
+                    :min="0.1" :step="0.1"></v-number-input>
+                <v-number-input v-model="propertiesPanelStore.height" controlVariant="stacked" label="Height (cm)"
+                    :min="0.01" :step="0.1"></v-number-input>
+                <v-number-input v-model="propertiesPanelStore.deep" controlVariant="stacked" label="Deep (cm)"
+                    :min="0.1" :step="0.01"></v-number-input>
 
                 <add-custom-variables></add-custom-variables>
 
@@ -62,16 +62,16 @@
 
                 <v-number-input v-model="propertiesPanelStore.panelThickness"
                     :disabled="!propertiesPanelStore.panelThicknessUnification" controlVariant="stacked"
-                    label="板材厚度 (mm)" :min="1"></v-number-input>
+                    label="板材厚度 (cm)" :min="0.1" :step="0.01"></v-number-input>
             </div>
 
-            <div v-if="!propertiesPanelStore.raw">
+            <!-- <div v-if="!propertiesPanelStore.raw">
                 <strong style="line-height: 50px;">Tolerance threshold</strong>
 
                 <v-slider v-model="propertiesPanelStore.threshold" :min="0" :max="0.075"
                     :ticks="{ '0': 'Close', '0.025': 'High', '0.05': 'Medium', '0.075': 'Low' }" show-ticks="always"
                     step="0.025" tick-size="4"></v-slider>
-            </div>
+            </div> -->
             <div v-if="propertiesPanelStore.raw">
                 <strong style="line-height: 50px;">Mesh 公式</strong>
 
