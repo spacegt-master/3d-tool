@@ -1,6 +1,6 @@
 <template>
     <TresCanvas v-bind="gl">
-        <TresPerspectiveCamera :position="[400, 400, 400]" :far="5000" />
+        <TresPerspectiveCamera :position="[200, 200, 200]" :far="5000" />
         <OrbitControls />
 
         <TresDirectionalLight :position="[150, 200, 250]" :intensity="1.5" cast-shadow />
@@ -20,17 +20,18 @@
 <script setup lang="ts">
 import { BasicShadowMap, SRGBColorSpace, ACESFilmicToneMapping, Mesh, Material, MeshBasicMaterial } from 'three';
 import { OrbitControls } from '@tresjs/cientos'
-import { storeToRefs } from 'pinia'
-import { useModelStore } from '@/stores/model';
 import { markRaw, watch } from 'vue';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js'
-import { usePropertiesPanelStore } from '@/stores/properties-panle';
-import { useLoader } from '@tresjs/core'
+import { useLoader, TresCanvas } from '@tresjs/core'
 
-const modelStore = useModelStore()
-const propertiesPanelStore = usePropertiesPanelStore()
+const defaultModel = defineModel()
 
-const { meshesData } = storeToRefs(modelStore)
+const props = defineProps({
+    url: {
+        type: String,
+        required: true
+    }
+})
 
 const gl = {
     clearColor: '#ffffff', // 新的背景颜色
@@ -42,7 +43,7 @@ const gl = {
     toneMappingExposure: 1.2,
 };
 
-const { state: model, isLoading } = useLoader(FBXLoader, propertiesPanelStore.getRawBlobUrl())
+const { state: model, isLoading } = useLoader(FBXLoader, props.url)
 
 // 🌟 【核心】定义高亮材质：使用 MeshBasicMaterial 实现纯色高亮，性能最好。
 const HOVER_MATERIAL = markRaw(new MeshBasicMaterial({
@@ -70,14 +71,28 @@ watch(model, () => {
     }
 })
 
+
+/**
+ * 🌟 核心清理函数：移除 Mesh 上的所有 TresJS/Vue 事件监听器
+ */
+function disposeEvents(mesh: Mesh) {
+    if (mesh._listeners) {
+        delete mesh._listeners;
+    }
+}
+
+
 /**
  * 处理 Mesh 点击事件：触发你的 CVZJ 业务逻辑
  */
 function handleMeshClick(event: any) {
-    // event.object 就是被点击的 THREE.Mesh 对象
     const clickedMesh = event.object as Mesh;
-    // 查找并处理对应的数据
-    console.log(clickedMesh.name)
+
+    handlePointerLeave(event)
+
+    disposeEvents(clickedMesh)
+
+    defaultModel.value = markRaw(clickedMesh)
 }
 
 /**

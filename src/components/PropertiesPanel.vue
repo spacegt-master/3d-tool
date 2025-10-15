@@ -3,7 +3,7 @@
         <v-list-item class="py-4">
             <template #title>
                 <div class="text-h6">
-                    参数化建模
+                    参数化建模 -> 语义化建模
                 </div>
             </template>
             <template #subtitle>

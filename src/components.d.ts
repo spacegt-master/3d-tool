@@ -14,6 +14,8 @@ declare module 'vue' {
     PropertiesPanel: typeof import('./components/PropertiesPanel.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SelectMesh: typeof import('./components/SelectMesh.vue')['default']
+    SelectMeshSide: typeof import('./components/SelectMeshSide.vue')['default']
     SelectModel: typeof import('./components/SelectModel.vue')['default']
     ToleranceThreshold: typeof import('./components/ToleranceThreshold.vue')['default']
   }
