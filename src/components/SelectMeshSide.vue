@@ -11,10 +11,7 @@
 
         <TresAmbientLight :intensity="0.5" />
 
-        <!-- 🌟 仅保留 Mesh 及其 BoxHelper，不再附加任何鼠标事件 -->
         <primitive v-if="mesh" :object="mesh">
-            <!-- BoxHelper 依然保留，作为视觉辅助线 -->
-            <Helper :type="BoxHelper" :args="[mesh, 'royalblue']" />
         </primitive>
 
         <!-- -------------------------------------------------------- -->
@@ -22,33 +19,23 @@
         <!-- -------------------------------------------------------- -->
         <!-- Group位置继承自mesh.position，因此内部Mesh坐标是相对mesh中心点的 -->
         <TresGroup v-if="mesh" :position="mesh.position">
-
-            <!-- X-AXIS SELECTION (Width: size.x) -->
-            <!-- 将其放置在 Y 和 Z 的正方向边界上，形成一个可见的边 -->
-            <TresMesh :position="[0, size.y / 2, size.z / 2]" @click="handleClickSide('x')"
+            <TresMesh :position="[0, size.y / 2 + sideOffset, size.z / 2 + sideOffset]" @click="handleClickSide('x')"
                 @pointerenter="handleSideEnter('x')" @pointerleave="handleSideLeave">
-                <!-- Geometry: X轴长，Y和Z轴加厚 (0.1) -->
-                <TresBoxGeometry :args="[size.x, size.y * 0.1, size.z * 0.1]" />
+                <TresBoxGeometry :args="[Math.max(size.x, sideOffset), sideOffset, sideOffset]" />
                 <TresMeshBasicMaterial :color="sideHovered === 'x' ? 0xFBB03B : 0xFF0000" :transparent="true"
                     :opacity="sideHovered === 'x' ? 1 : 0.5" />
             </TresMesh>
 
-            <!-- Y-AXIS SELECTION (Height: size.y) -->
-            <!-- 将其放置在 X 和 Z 的正方向边界上 -->
-            <TresMesh :position="[size.x / 2, 0, size.z / 2]" @click="handleClickSide('y')"
+            <TresMesh :position="[size.x / 2 + sideOffset, 0, size.z / 2 + sideOffset]" @click="handleClickSide('y')"
                 @pointerenter="handleSideEnter('y')" @pointerleave="handleSideLeave">
-                <!-- Geometry: Y轴长，X和Z轴加厚 (0.1) -->
-                <TresBoxGeometry :args="[size.x * 0.1, size.y, size.z * 0.1]" />
+                <TresBoxGeometry :args="[sideOffset, Math.max(size.y, sideOffset), sideOffset]" />
                 <TresMeshBasicMaterial :color="sideHovered === 'y' ? 0xFBB03B : 0x00FF00" :transparent="true"
                     :opacity="sideHovered === 'y' ? 1 : 0.5" />
             </TresMesh>
 
-            <!-- Z-AXIS SELECTION (Depth: size.z) -->
-            <!-- 将其放置在 X 和 Y 的正方向边界上 -->
-            <TresMesh :position="[size.x / 2, size.y / 2, 0]" @click="handleClickSide('z')"
+            <TresMesh :position="[size.x / 2 + sideOffset, size.y / 2 + sideOffset, 0]" @click="handleClickSide('z')"
                 @pointerenter="handleSideEnter('z')" @pointerleave="handleSideLeave">
-                <!-- Geometry: Z轴长，X和Y轴加厚 (0.1) -->
-                <TresBoxGeometry :args="[size.x * 0.1, size.y * 0.1, size.z]" />
+                <TresBoxGeometry :args="[sideOffset, sideOffset, Math.max(size.z, sideOffset)]" />
                 <TresMeshBasicMaterial :color="sideHovered === 'z' ? 0xFBB03B : 0x0000FF" :transparent="true"
                     :opacity="sideHovered === 'z' ? 1 : 0.5" />
             </TresMesh>
@@ -58,13 +45,12 @@
 
 <script setup lang="ts">
 import { BasicShadowMap, SRGBColorSpace, ACESFilmicToneMapping, Mesh, Material, MeshBasicMaterial, BoxHelper, PointLightHelper, Box3, Vector3 } from 'three';
-import { Helper, OrbitControls } from '@tresjs/cientos'
+import { Helper, OrbitControls, Line2, TransformControls } from '@tresjs/cientos'
 import { VertexNormalsHelper } from 'three-stdlib'
 import { computed, markRaw, onMounted, ref, watch } from 'vue';
 import { usePropertiesPanelStore } from '@/stores/properties-panle';
 import { TresCanvas } from '@tresjs/core'
-
-const propertiesPanelStore = usePropertiesPanelStore()
+import { shallowRef } from 'vue';
 
 const sideModel = defineModel()
 
@@ -82,6 +68,7 @@ const gl = {
     toneMappingExposure: 1.2,
 };
 
+const sideOffset = 2
 
 // 记录哪个轴正在被悬停（用于高亮）
 const sideHovered = ref<'x' | 'y' | 'z' | null>(null);
@@ -98,7 +85,7 @@ const size = computed(() => {
     // 创建一个 Vector3 实例来存储尺寸
     const dimensions = new Vector3();
     box.getSize(dimensions);
-
+    console.log(dimensions)
     // 返回 Mesh 的原始尺寸 
     return {
         x: dimensions.x, // width
@@ -123,9 +110,12 @@ function handleClickSide(side: 'x' | 'y' | 'z') {
 
     // 2. 打印基准值，用于调试和确认
     const baseValue = size.value[side];
+
     console.log(`用户选择了 ${side.toUpperCase()} 轴作为基准，尺寸: ${baseValue.toFixed(3)}`);
 
     // TODO: 通知父组件（或 Store）进入“设定变量名”步骤
+
+    sideModel.value = side
 }
 
 /**

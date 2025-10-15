@@ -18,7 +18,7 @@
                     </template>
 
                     <template v-slot:item.3>
-
+                        第三步设置变量
                     </template>
                 </v-stepper>
             </template>
@@ -48,6 +48,12 @@ const items = [
 watch(mesh, () => {
     if (mesh.value) {
         step.value = 2
+    }
+})
+
+watch(side, () => {
+    if (mesh.value) {
+        step.value = 3
     }
 })
 
